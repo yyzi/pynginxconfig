@@ -39,6 +39,9 @@ class NginxConfig:
     def __delitem__(self, index):
         del self.data[index]
 
+    def __call__(self):
+        return self.gen_config()
+
     def get_value(self, data):
         if isinstance(data, tuple):
             return data[1]
@@ -55,7 +58,33 @@ class NginxConfig:
         else:
             return data
 
-    def get(self, item_arr, data=[], param=None):
+    def set(self, item_arr, value):
+        if isinstance(item_arr, str):
+            elem = item_arr
+            parent = self.data
+        elif isinstance(item_arr, list) and len(item_arr) == 1:
+            elem = item_arr[0]
+            parent = self.data
+        else:
+            elem = item_arr.pop()
+            parent = self.get_value(self.get(item_arr))
+        if isinstance(elem, str) and isinstance(value, str):
+            for i, param in enumerate(parent):
+                if isinstance(param, tuple):
+                    if param[0] == elem:
+                        parent[i] = (param[0], value)
+                        return
+        elif isinstance(elem, tuple) and isinstance(value, list):
+            for i, param in enumerate(parent):
+                if isinstance(param, dict):
+                    if param == (param['name'], param['value']):
+                        parent[i]['value'] = value
+                        return
+                    else:
+                        print(str(param))
+        raise KeyError('No such parameter.')
+
+    def get(self, item_arr, data=[]):
         if data == []:
             data = self.data
         if type(item_arr) in [str, tuple]:
@@ -73,6 +102,8 @@ class NginxConfig:
                             if (data_elem['name'], data_elem['param']) == element:
                                 return self.get(item_arr, self.get_value(data[i]))
 
+        if not 'item' in locals():
+            raise KeyError('Error while getting parameter.')
         if isinstance(item, str):
             for i, elem in enumerate(data):
                 if isinstance(elem, tuple):
