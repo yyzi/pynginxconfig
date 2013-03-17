@@ -107,14 +107,8 @@ class NginxConfig:
                 item = item_arr[0]
             else:
                 elem = item_arr.pop(0)
-                if isinstance(elem, str):#strange code
-                    self.remove(item_arr, self.get_value(elem, data))
-                elif isinstance(elem, tuple):
-                    if len(elem) == 2:
-                        param = elem[1]
-                    else:
-                        param = ''
-                    self.remove(item_arr, self.get_value(elem[0], data, param=param))
+                if type(elem) in [tuple,str]:
+                    self.remove(item_arr, self.get_value(self.get(elem, data)))
                     return
 
         if isinstance(item, str):
@@ -131,6 +125,7 @@ class NginxConfig:
                         return
         else:
             raise AttributeError("Unknown item type '%s' in item_arr" % item.__class__.__name__)
+        raise KeyError('Unable to remove')
 
     def load(self, config):
         self.config = config
