@@ -110,7 +110,7 @@ class NginxConfig:
         self.i = 0
         self.data = self.parse_block()
 
-    def parse_block(self, name=''):
+    def parse_block(self):
         data = []
         param_name = None
         param_value = None
@@ -139,7 +139,7 @@ class NginxConfig:
                 buf = ''
             elif self.config[self.i] == '{':
                 self.i += 1
-                block = self.parse_block(name+':'+param_name)
+                block = self.parse_block()
                 data.append({'name':param_name, 'param':buf.strip(), 'value':block})
                 param_name = None
                 param_value = None
