@@ -38,26 +38,54 @@ class NginxConfig:
 
     def __delitem__(self, index):
         del self.data[index]
-    
-    def get(self, item, data=[], param=None):
+
+    def get_value(self, data):
+        if isinstance(data, tuple):
+            return data[1]
+        elif isinstance(data, dict):
+            return data['value']
+        else:
+            return data
+
+    def get_name(self, data):
+        if isinstance(data, tuple):
+            return data[0]
+        elif isinstance(data, dict):
+            return data['name']
+        else:
+            return data
+
+    def get(self, item_arr, data=[], param=None):
         if data == []:
             data = self.data
-        for d in data:
-            if isinstance(d, tuple) and d[0] == item:
-                return d
-            elif isinstance(d, dict):
-                if (d['name'] == item) and (param is None or param == d['param']):
-                    return d
-        return None
+        if type(item_arr) in [str, tuple]:
+            item = item_arr
+        elif isinstance(item_arr, list):
+            if len(item_arr) == 1:
+                item = item_arr[0]
+            else:
+                element = item_arr.pop(0)
+                    
+                if isinstance(element, tuple):#cannot be a string
+                    if len(element) == 1:
+                        element = (element[0], '')
+                    for i, data_elem in enumerate(data):
+                        if isinstance(data_elem, dict):
+                            if (data_elem['name'], data_elem['param']) == element:
+                                return self.get(item_arr, self.get_value(data[i]))
 
-    def get_value(self, item, data=[], param=None):
-        rez = self.get(item, data, param)
-        if isinstance(rez, tuple):
-            return rez[1]
-        elif isinstance(rez, dict):
-            return rez['value']
-        else:
-            return rez
+        if isinstance(item, str):
+            for i, elem in enumerate(data):
+                if isinstance(elem, tuple):
+                    if elem[0] == item:
+                        return data[i]
+        elif isinstance(item, tuple):
+            if len(item) == 1:
+                item = (item[0], '')
+            for i, elem in enumerate(data):
+                if isinstance(elem, dict):
+                    if (elem['name'], elem['param']) == item:
+                        return data[i]
 
     def append(self, item, root=[], position=None):
         if root == []:
@@ -79,7 +107,7 @@ class NginxConfig:
                 item = item_arr[0]
             else:
                 elem = item_arr.pop(0)
-                if isinstance(elem, str):
+                if isinstance(elem, str):#strange code
                     self.remove(item_arr, self.get_value(elem, data))
                 elif isinstance(elem, tuple):
                     if len(elem) == 2:
