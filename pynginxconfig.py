@@ -69,17 +69,36 @@ class NginxConfig:
         else:
             root.append(item)
 
-    def remove(self, item, data=[]):
+    def remove(self, item_arr, data=[]):
         if data == []:
             data = self.data
-        for i,d in enumerate(data):
-            if isinstance(d, tuple) and d[0] == item:
-                del data[i]
-                return
-            elif isinstance(d, dict):
-                if d['name'] == item:
-                    del data[i]
+        if type(item_arr) in [str, tuple]:
+            item = item_arr
+        elif isinstance(item_arr, list):
+            if len(item_arr) == 1:
+                item = item_arr[0]
+            else:
+                elem = item_arr.pop(0)
+                if isinstance(elem, str):
+                    self.remove(item_arr, self.get_value(elem, data))
+                elif isinstance(elem, tuple):
+                    self.remove(item_arr, self.get_value(elem[0], data, param=elem[1]))
                     return
+
+        if isinstance(item, str):
+            for i,elem in enumerate(data):
+                if isinstance(elem, tuple):
+                    if elem[0] == item:
+                        del data[i]
+                        return
+        elif isinstance(item, tuple):
+            for i,elem in enumerate(data):
+                if isinstance(elem, dict):
+                    if (elem['name'], elem['param']) == item:
+                        del data[i]
+                        return
+        else:
+            raise AttributeError("Unknown item type '%s' in item_arr" % item.__class__.__name__)
 
     def load(self, config):
         self.config = config
