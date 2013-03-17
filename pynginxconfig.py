@@ -169,7 +169,9 @@ class NginxConfig:
                     param = block['param'] + ' '
                 else:
                     param = ''
-                subrez += '\n%(offset)s%(name)s %(param)s{\n%(data)s%(offset)s}\n' % {
+                if subrez != '':
+                    subrez += '\n'
+                subrez += '%(offset)s%(name)s %(param)s{\n%(data)s%(offset)s}\n' % {
                     'offset':self.off_char * offset, 'name':block['name'], 'data':block_value,
                     'param':param}
 
@@ -180,7 +182,7 @@ class NginxConfig:
                     subrez += '%s%s\n' % (self.off_char * offset, block)
 
         if block_name:
-            return '\n%(offset)s%(name)s %(param)s{\n%(data)s%(offset)s}\n' % {
+            return '%(offset)s%(name)s %(param)s{\n%(data)s%(offset)s}\n' % {
                 'offset':self.off_char * offset, 'name':block_name, 'data':subrez,
                 'param':block_param}
         else:
