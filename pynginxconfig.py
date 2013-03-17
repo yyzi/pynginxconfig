@@ -65,7 +65,6 @@ class NginxConfig:
                 item = item_arr[0]
             else:
                 element = item_arr.pop(0)
-                    
                 if isinstance(element, tuple):#cannot be a string
                     if len(element) == 1:
                         element = (element[0], '')
@@ -86,6 +85,7 @@ class NginxConfig:
                 if isinstance(elem, dict):
                     if (elem['name'], elem['param']) == item:
                         return data[i]
+        return None
 
     def append(self, item, root=[], position=None):
         if root == []:
