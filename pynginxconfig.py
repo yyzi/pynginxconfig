@@ -82,7 +82,11 @@ class NginxConfig:
                 if isinstance(elem, str):
                     self.remove(item_arr, self.get_value(elem, data))
                 elif isinstance(elem, tuple):
-                    self.remove(item_arr, self.get_value(elem[0], data, param=elem[1]))
+                    if len(elem) == 2:
+                        param = elem[1]
+                    else:
+                        param = ''
+                    self.remove(item_arr, self.get_value(elem[0], data, param=param))
                     return
 
         if isinstance(item, str):
