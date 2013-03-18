@@ -68,6 +68,7 @@ class NginxConfig:
         else:
             elem = item_arr.pop()
             parent = self.get_value(self.get(item_arr))
+
         if isinstance(elem, str) and isinstance(value, str):
             for i, param in enumerate(parent):
                 if isinstance(param, tuple):
@@ -75,13 +76,15 @@ class NginxConfig:
                         parent[i] = (param[0], value)
                         return
         elif isinstance(elem, tuple) and isinstance(value, list):
+            if len(elem) == 1:
+                elem = (elem[0], '')
             for i, param in enumerate(parent):
                 if isinstance(param, dict):
-                    if param == (param['name'], param['value']):
+                    if elem == (param['name'], param['param']):
                         parent[i]['value'] = value
                         return
-                    else:
-                        print(str(param))
+        else:
+            raise TypeError('Not expected value type')
         raise KeyError('No such parameter.')
 
     def get(self, item_arr, data=[]):
