@@ -152,6 +152,8 @@ class NginxConfig:
                         del data[i]
                         return
         elif isinstance(item, tuple):
+            if len(item) == 1:
+                item = (item[0], '')
             for i,elem in enumerate(data):
                 if isinstance(elem, dict):
                     if (elem['name'], elem['param']) == item:
