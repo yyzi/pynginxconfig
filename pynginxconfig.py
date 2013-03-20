@@ -86,25 +86,25 @@ class NginxConfig:
                         elif name is not None:
                             parent[i] = (name, param[1])
                             return
+                        raise TypeError('Not expected value type')
 
-        elif isinstance(elem, tuple) and isinstance(value, list):
+        elif isinstance(elem, tuple):
             #modifying block
             if len(elem) == 1:
                 elem = (elem[0], '')
-            for i, param in enumerate(parent):
-                if isinstance(param, dict):
-                    if elem == (param['name'], param['param']):
-                        if value is not None:
+            for i, block in enumerate(parent):
+                if isinstance(block, dict):
+                    if elem == (block['name'], block['param']):
+                        if value is not None and isinstance(value, list):
                             parent[i]['value'] = value
                             return
-                        if param is not None:
+                        if param is not None and isinstance(param, str):
                             parent[i]['param'] = param
                             return
-                        if name is not None:
+                        if name is not None and isinstance(name, str):
                             parent[i]['name'] = name
                             return
-        else:
-            raise TypeError('Not expected value type')
+                        raise TypeError('Not expected value type')
         raise KeyError('No such parameter.')
 
     def get(self, item_arr, data=[]):
