@@ -58,7 +58,7 @@ class NginxConfig:
         else:
             return data
 
-    def set(self, item_arr, value):
+    def set(self, item_arr, value=None, param=None, name=None):
         if isinstance(item_arr, str):
             elem = item_arr
             parent = self.data
@@ -73,19 +73,36 @@ class NginxConfig:
             raise KeyError('No such block.')
 
         if isinstance(elem, str) and isinstance(value, str):
+            #modifying text parameter
             for i, param in enumerate(parent):
                 if isinstance(param, tuple):
                     if param[0] == elem:
-                        parent[i] = (param[0], value)
-                        return
+                        if value is not None and name is not None:
+                            parent[i] = (name, value)
+                            return
+                        elif value is not None:
+                            parent[i] = (param[0], value)
+                            return
+                        elif name is not None:
+                            parent[i] = (name, param[1])
+                            return
+
         elif isinstance(elem, tuple) and isinstance(value, list):
+            #modifying block
             if len(elem) == 1:
                 elem = (elem[0], '')
             for i, param in enumerate(parent):
                 if isinstance(param, dict):
                     if elem == (param['name'], param['param']):
-                        parent[i]['value'] = value
-                        return
+                        if value is not None:
+                            parent[i]['value'] = value
+                            return
+                        if param is not None:
+                            parent[i]['param'] = param
+                            return
+                        if name is not None:
+                            parent[i]['name'] = name
+                            return
         else:
             raise TypeError('Not expected value type')
         raise KeyError('No such parameter.')
