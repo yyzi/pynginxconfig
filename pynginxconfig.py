@@ -69,6 +69,9 @@ class NginxConfig:
             elem = item_arr.pop()
             parent = self.get_value(self.get(item_arr))
 
+        if parent is None:
+            raise KeyError('No such block.')
+
         if isinstance(elem, str) and isinstance(value, str):
             for i, param in enumerate(parent):
                 if isinstance(param, tuple):
@@ -168,6 +171,22 @@ class NginxConfig:
         self.length = len(config) - 1
         self.i = 0
         self.data = self.parse_block()
+
+    def loadf(self, filename):
+        try:
+            f = open(filename, 'r')
+            conf = f.read()
+            self.load(conf)
+        finally:
+            f.close()
+
+    def savef(self, filename):
+        try:
+            f = open(filename, 'w')
+            conf = self.gen_config()
+            f.write(conf)
+        finally:
+            f.close()
 
     def parse_block(self):
         data = []
