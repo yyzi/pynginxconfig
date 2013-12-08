@@ -228,7 +228,10 @@ class NginxConfig:
                     param_value.append(buf.strip())
                 else:
                     param_value = buf.strip()
-                data.append((param_name, param_value))
+                if param_name:
+                    data.append((param_name, param_value))
+                else:
+                    data.append((param_value,))
                 param_name = None
                 param_value = None
                 buf = ''
@@ -256,7 +259,9 @@ class NginxConfig:
         block_param = ''
         for i, block in enumerate(blocks):
             if isinstance(block, tuple):
-                if isinstance(block[1], str):
+                if len(block) == 1 and type(block[0]) == str: #single param
+                    subrez += self.off_char * offset + '%s;\n' % (block[0])
+                elif isinstance(block[1], str):
                     subrez += self.off_char * offset + '%s %s;\n' % (block[0], block[1])
                 else: #multiline
                     subrez += self.off_char * offset + '%s %s;\n' % (block[0], 
