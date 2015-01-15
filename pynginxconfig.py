@@ -190,20 +190,14 @@ class NginxConfig:
         self.data = self.parse_block()
 
     def loadf(self, filename):
-        try:
-            f = open(filename, 'r')
+        with open(filename, 'r') as f:
             conf = f.read()
             self.load(conf)
-        finally:
-            f.close()
 
     def savef(self, filename):
-        try:
-            f = open(filename, 'w')
+        with open(filename, 'w') as f:
             conf = self.gen_config()
             f.write(conf)
-        finally:
-            f.close()
 
     def parse_block(self):
         data = []
